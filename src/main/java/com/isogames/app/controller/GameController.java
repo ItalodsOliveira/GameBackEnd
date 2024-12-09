@@ -27,4 +27,21 @@ public class GameController {
         return gameService.readGames();
     }
 
+    @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public Game readGameById(@PathVariable(value = "id", required = true)Long id){
+
+        return gameService.readGameById(id);
+    }
+
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public Game updateGame(@RequestBody Game game) {
+
+        return gameService.updateGame(game);
+    }
+
+    @DeleteMapping(value = "{id}")
+    public void deleteGameById(@PathVariable(value = "id",required = true) Long id){
+
+        gameService.deleteGameById(id);
+    }
 }

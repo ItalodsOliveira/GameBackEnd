@@ -32,7 +32,7 @@ public class Game implements Serializable {
     @Column(nullable = false, length = 50)
     private List<String> genero;
     @Column(nullable = false, length = 50, name = "classificacao_indicaiva")
-    private String calassificacaoIndiacativa;
+    private String classificacaoIndiacativa;
     @Column(nullable = false, length = 250)
     private List<String> idiomas;
     @Column(nullable = false, length = 250)
@@ -110,12 +110,12 @@ public class Game implements Serializable {
         this.genero = genero;
     }
 
-    public String getCalassificacaoIndiacativa() {
-        return calassificacaoIndiacativa;
+    public String getClassificacaoIndiacativa() {
+        return classificacaoIndiacativa;
     }
 
-    public void setCalassificacaoIndiacativa(String calassificacaoIndiacativa) {
-        this.calassificacaoIndiacativa = calassificacaoIndiacativa;
+    public void setClassificacaoIndiacativa(String classificacaoIndiacativa) {
+        this.classificacaoIndiacativa = classificacaoIndiacativa;
     }
 
     public List<String> getIdiomas() {
