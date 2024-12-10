@@ -31,14 +31,14 @@ public class GameService {
 
     public Game readGameById(Long id) {
 
-        var game = gameRepository.findById(id).orElseThrow();
+        var game = gameRepository.findById(String.valueOf(id)).orElseThrow();
         logger.info(MessageFormat.format("O jogo {0} foi encontrado com sucesso com o preço de R${1}", game.getNomeDoJogo(), game.getPreco()));
         return game;
     }
 
     public Game updateGame(Game game) {
 
-        var gameAtualizado = gameRepository.findById(game.getId()).orElseThrow();
+        var gameAtualizado = gameRepository.findById(String.valueOf(game.getId())).orElseThrow();
         gameAtualizado.setNomeDoJogo(game.getNomeDoJogo());
         gameAtualizado.setDataDeLancamaento(game.getDataDeLancamaento());
         gameAtualizado.setDescricao(game.getDescricao());
@@ -57,8 +57,15 @@ public class GameService {
 
     public void deleteGameById(Long id){
 
-        var game = gameRepository.findById(id).orElseThrow();
+        var game = gameRepository.findById(String.valueOf(id)).orElseThrow();
         gameRepository.delete(game);
         logger.info("Game deletado com sucesso");
+    }
+
+    public List<Game> readGameByName(String nomeDoJogo){
+
+        var game = gameRepository.pesquisaPorNome(nomeDoJogo);
+        logger.info(MessageFormat.format("{0} foram encontrados com Sucesso", game.size()));
+        return game;
     }
 }

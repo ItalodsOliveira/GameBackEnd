@@ -3,6 +3,7 @@ package com.isogames.app.controller;
 import com.isogames.app.model.Game;
 import com.isogames.app.service.GameService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,5 +44,11 @@ public class GameController {
     public void deleteGameById(@PathVariable(value = "id",required = true) Long id){
 
         gameService.deleteGameById(id);
+    }
+
+    @GetMapping(value = "nome-do-jogo", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<Game> readGameByName(@RequestParam(value = "nomeDoJogo", required = true)String nomeDoJogo){
+
+        return gameService.readGameByName(nomeDoJogo);
     }
 }
