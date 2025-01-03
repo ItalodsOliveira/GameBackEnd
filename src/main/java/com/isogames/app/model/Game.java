@@ -31,7 +31,7 @@ public class Game implements Serializable {
     private List<String> plataforma;
     @Column(nullable = false, length = 50)
     private List<String> genero;
-    @Column(nullable = false, length = 50, name = "classificacao_indicaiva")
+    @Column(nullable = false, length = 50, name = "classificacao_indicativa")
     private String classificacaoIndiacativa;
     @Column(nullable = false, length = 250)
     private List<String> idiomas;

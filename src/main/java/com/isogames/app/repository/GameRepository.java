@@ -10,9 +10,18 @@ import java.util.List;
 @Repository
 public interface GameRepository extends JpaRepository<Game, String> {
 
-    //@Query(value = "Select n from Game n where n.nomeDoJogo like %?1%")
+    @Query(value = "Select n from Game n where n.nomeDoJogo like %?1%")
+    List<Game> pesquisaPorNome(String nomeDoJogo);
+
+    //@Query(nativeQuery = true, value = "SELECT * FROM public.game where nome_do_jogo like %?1%")
     //List<Game> pesquisaPorNome(String nomeDoJogo);
 
-    @Query(nativeQuery = true, value = "SELECT * FROM public.game where nome_do_jogo like %?1%")
-    List<Game> pesquisaPorNome(String nomeDoJogo);
+    @Query(value = "Select n from Game n where n.desenvolvedora like %?1%")
+    List<Game> pesquisaPorDev(String desenvolvedora);
+
+    @Query(value = "Select n from Game n where n.distribuidora like %?1%")
+    List<Game> pesquisaPorDistribuidora(String distribuidora);
+
+    @Query(value = "Select n from Game n where n.classificacaoIndiacativa like %?1%")
+    List<Game> pesquisaPorClasseIndica(String classificacaoIndiacativa);
 }
