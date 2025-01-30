@@ -1,6 +1,7 @@
 package com.isogames.app.controller;
 
 import com.isogames.app.model.Game;
+import com.isogames.app.model.response.GameResponseError;
 import com.isogames.app.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -8,13 +9,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.MessageFormat;
-import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -55,10 +55,23 @@ public class GameController {
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity readGameById(@PathVariable(value = "id", required = true) Long id) {
 
-        Game game = gameService.readGameById(id);
-        if (game == null) {
-            var respostaDeErro = MessageFormat.format("Não foi encontrado nenhum jogo com o id {0}", id);
-            ResponseEntity.badRequest().body(respostaDeErro);
+        GameResponseError gameResponseError = new GameResponseError();
+        var game = gameService.readGameById(id);
+        try {
+            if (game.getId() == null) {
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo com o id {0}", id));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
         }
         return ResponseEntity.ok().body(game);
     }
@@ -89,11 +102,16 @@ public class GameController {
     @GetMapping(value = "nome-do-jogo", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity readGameByName(@RequestParam(value = "nomeDoJogo", required = true) String nomeDoJogo) {
 
+        GameResponseError gameResponseError = new GameResponseError();
         List<Game> game = gameService.readGameByName(nomeDoJogo);
 
         if (game.isEmpty()) {
-            var respostaDeErro = MessageFormat.format("Não foram encopntrados games com o nome {0}", nomeDoJogo);
-            return ResponseEntity.badRequest().body(respostaDeErro);
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(MessageFormat.format("Não foram encopntrados games com o nome {0}", nomeDoJogo));
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
         }
         return ResponseEntity.ok().body(game);
     }

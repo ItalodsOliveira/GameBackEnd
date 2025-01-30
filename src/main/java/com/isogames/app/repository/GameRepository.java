@@ -24,4 +24,7 @@ public interface GameRepository extends JpaRepository<Game, String> {
 
     @Query(value = "Select n from Game n where n.classificacaoIndiacativa like %?1%")
     List<Game> pesquisaPorClasseIndica(String classificacaoIndiacativa);
+
+    @Query(value = "Select n from Game n where n.preco in (?1)")
+    List<Game> pesquisaPorPreco(float preco);
 }

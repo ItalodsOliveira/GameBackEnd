@@ -1,12 +1,15 @@
 package com.isogames.app.service;
 
 import com.isogames.app.model.Game;
+import com.isogames.app.model.response.GameResponseError;
 import com.isogames.app.repository.GameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
