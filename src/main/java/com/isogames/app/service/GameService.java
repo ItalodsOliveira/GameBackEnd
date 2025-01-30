@@ -48,11 +48,17 @@ public class GameService {
 
     public Game readGameById(Long id) {
 
+        GameResponseError gameResponseError = new GameResponseError();
         Game game = new Game();
         try {
             game = gameRepository.findById(String.valueOf(id)).orElseThrow();
         } catch (Exception e) {
-            throw new RuntimeException(e);
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return game;
         }
         logger.info(MessageFormat.format("O jogo {0} foi encontrado com sucesso com o preço de R${1}", game.getNomeDoJogo(), game.getPreco()));
         return game;
@@ -139,6 +145,30 @@ public class GameService {
             game = gameRepository.pesquisaPorClasseIndica(classificacaoIndiacativa);
             logger.info(MessageFormat.format("{0} foram encontrados com Sucesso", game.size()));
         } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return game;
+    }
+
+    public List<Game> readGameByPrecoIn(float preco){
+
+        List<Game> game = new ArrayList<>();
+        try {
+            game = gameRepository.pesquisaPorPreco(preco);
+            logger.info(MessageFormat.format("{0} foram encontrados com Sucesso", game.size()));
+        } catch (Exception e){
+            throw new RuntimeException(e);
+        }
+        return game;
+    }
+
+    public List<Game> readGameByPrecoEntre(float preco1, float preco2){
+
+        List<Game> game = new ArrayList<>();
+        try {
+            game = gameRepository.pesquisaPorPrecoEntre(preco1, preco2);
+            logger.info(MessageFormat.format("Foram encontrados {0} games com o preço entre {1} e {2}", game.size(), preco1, preco2));
+        } catch (Exception e){
             throw new RuntimeException(e);
         }
         return game;

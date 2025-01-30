@@ -27,4 +27,7 @@ public interface GameRepository extends JpaRepository<Game, String> {
 
     @Query(value = "Select n from Game n where n.preco in (?1)")
     List<Game> pesquisaPorPreco(float preco);
+
+    @Query(value = "Select n from Game n where n.preco between ?1 and ?2")
+    List<Game> pesquisaPorPrecoEntre(float preco1, float preco2);
 }

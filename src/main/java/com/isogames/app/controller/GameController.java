@@ -85,7 +85,7 @@ public class GameController {
     public ResponseEntity updateGame(@RequestBody Game game) {
 
         Game gameAtualizado = gameService.updateGame(game);
-        if (gameAtualizado == null) {
+        if (gameAtualizado.getId() == null) {
 
             var respostaDeErro = "Não Possivel atualizar game vazio";
             ResponseEntity.badRequest().body(respostaDeErro);
@@ -155,5 +155,55 @@ public class GameController {
 
     }
 
+    @GetMapping(value = "preco", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity readGameByPrecoIn(@RequestParam(value = "precoin", required = true) float preco){
+
+        GameResponseError gameResponseError = new GameResponseError();
+        List<Game> game = gameService.readGameByPrecoIn(preco);
+
+        try {
+            if (game.isEmpty()){
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo com o preco {0}", preco));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
+        }
+        return ResponseEntity.ok().body(game);
+    }
+
+    @GetMapping(value = "precoentre", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity readGameByPrecoEntre(@RequestParam(value = "preco1", required = true) float preco1,
+                                               @RequestParam(value = "preco2", required = true) float preco2){
+
+        GameResponseError gameResponseError = new GameResponseError();
+        List<Game> game = gameService.readGameByPrecoEntre(preco1, preco2);
+
+        try {
+            if (game.isEmpty()){
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo com o preço entre R${0} e R${1}", preco1, preco2 ));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
+        }
+        return ResponseEntity.ok().body(game);
+    }
 
 }
