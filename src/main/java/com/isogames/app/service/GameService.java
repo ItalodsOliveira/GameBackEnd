@@ -3,6 +3,7 @@ package com.isogames.app.service;
 import com.isogames.app.model.Game;
 import com.isogames.app.model.response.GameResponseError;
 import com.isogames.app.repository.GameRepository;
+import com.isogames.app.utils.AjustaPreco;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,9 @@ public class GameService {
 
     @Autowired
     GameRepository gameRepository;
+
+    @Autowired
+    AjustaPreco ajustaPreco;
 
     public Game createGame(Game game) {
 
@@ -150,27 +154,50 @@ public class GameService {
         return game;
     }
 
-    public List<Game> readGameByPrecoIn(float preco){
+    public List<Game> readGameByPrecoIn(float preco) {
 
         List<Game> game = new ArrayList<>();
         try {
             game = gameRepository.pesquisaPorPreco(preco);
-            logger.info(MessageFormat.format("{0} foram encontrados com Sucesso", game.size()));
-        } catch (Exception e){
+            logger.info(MessageFormat.format("Foram encontrados {0} games com Sucesso com o preço {1}", game.size(), preco));
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return game;
     }
 
-    public List<Game> readGameByPrecoEntre(float preco1, float preco2){
+    public List<Game> readGameByPrecoEntre(float preco1, float preco2) {
 
         List<Game> game = new ArrayList<>();
         try {
             game = gameRepository.pesquisaPorPrecoEntre(preco1, preco2);
             logger.info(MessageFormat.format("Foram encontrados {0} games com o preço entre {1} e {2}", game.size(), preco1, preco2));
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
         return game;
     }
+
+    public List<Game> mudaPrecoByClasseIndica(String classificacaoIndiacativa, float percentual, boolean desconto) {
+
+        List<Game> game = new ArrayList<>();
+        try {
+            game = gameRepository.pesquisaPorClasseIndica(classificacaoIndiacativa);
+            logger.info(MessageFormat.format("{0} foram encontrados", game.size()));
+
+            for (int i = 0; i < game.size(); i++) {
+                if (desconto == true) {
+                    game.get(i).setPreco(ajustaPreco.aplicarDesconto(game.get(i).getPreco(), percentual));
+                    logger.info(MessageFormat.format("Foi aplicado um desconto de {0}%, para a classificação indicativa {1}", percentual, classificacaoIndiacativa));
+                } else {
+                    game.get(i).setPreco(ajustaPreco.aplicarAumento(game.get(i).getPreco(), percentual));
+                    logger.info(MessageFormat.format("Foi aplicado um aumento de {0}%, para a classificação indicativa {1}", percentual, classificacaoIndiacativa));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return game;
+    }
+
 }

@@ -1,33 +1,15 @@
 package com.isogames.app.model.response;
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.Date;
 
+@Setter
+@Getter
 public class GameResponseError {
 
     private int httpCode;
     private String mensagemDeErro;
     private Date horaDoErro;
 
-    public int getHttpCode() {
-        return httpCode;
-    }
-
-    public void setHttpCode(int httpCode) {
-        this.httpCode = httpCode;
-    }
-
-    public String getMensagemDeErro() {
-        return mensagemDeErro;
-    }
-
-    public void setMensagemDeErro(String mensagemDeErro) {
-        this.mensagemDeErro = mensagemDeErro;
-    }
-
-    public Date getHoraDoErro() {
-        return horaDoErro;
-    }
-
-    public void setHoraDoErro(Date horaDoErro) {
-        this.horaDoErro = horaDoErro;
-    }
 }
