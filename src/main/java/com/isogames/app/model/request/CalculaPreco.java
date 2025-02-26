@@ -8,6 +8,7 @@ import lombok.Setter;
 public class CalculaPreco {
 
     String classificacaoIndicativa;
+    String distribuidora;
     float percentual;
     boolean desconto;
 }

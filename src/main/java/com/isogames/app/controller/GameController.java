@@ -2,6 +2,8 @@ package com.isogames.app.controller;
 
 import com.isogames.app.model.Game;
 import com.isogames.app.model.request.CalculaPreco;
+import com.isogames.app.model.request.EfetivarCompra;
+import com.isogames.app.model.response.GameResponseCompra;
 import com.isogames.app.model.response.GameResponseError;
 import com.isogames.app.service.GameService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,7 +11,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -223,7 +224,7 @@ public class GameController {
         return ResponseEntity.ok().body(game);
     }
 
-    @GetMapping(value = "precoentre", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "precoEntre", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity readGameByPrecoEntre(@RequestParam(value = "preco1", required = true) float preco1,
                                                @RequestParam(value = "preco2", required = true) float preco2) {
 
@@ -249,8 +250,8 @@ public class GameController {
         return ResponseEntity.ok().body(game);
     }
 
-    @PutMapping(value = "atualizapreco", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity mudaPrecoByClasseIndica(@RequestBody CalculaPreco calculaPreco){
+    @PutMapping(value = "atualizaPreco", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity mudaPrecoByClasseIndica(@RequestBody CalculaPreco calculaPreco) {
 
         GameResponseError gameResponseError = new GameResponseError();
         List<Game> game = gameService.mudaPrecoByClasseIndica(calculaPreco.getClassificacaoIndicativa(), calculaPreco.getPercentual(), calculaPreco.isDesconto());
@@ -258,7 +259,57 @@ public class GameController {
         try {
             if (game.isEmpty()) {
                 gameResponseError.setHttpCode(400);
-                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo com a classificação indicaiva {0}",calculaPreco.getClassificacaoIndicativa()));
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo com a classificação indicaiva {0}", calculaPreco.getClassificacaoIndicativa()));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
+        }
+        return ResponseEntity.ok().body(game);
+    }
+
+    @PutMapping(value = "atualizaPrecoDistribuidora", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity mudaPrecoByDistribuidora(@RequestBody CalculaPreco calculaPreco) {
+
+        GameResponseError gameResponseError = new GameResponseError();
+        List<Game> game = gameService.mudaPrecoByDistribuidora(calculaPreco.getDistribuidora(), calculaPreco.getPercentual(), calculaPreco.isDesconto());
+
+        try {
+            if (game.isEmpty()) {
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo da distribuidora {0}", calculaPreco.getDistribuidora()));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
+        }
+        return ResponseEntity.ok().body(game);
+    }
+
+    @PostMapping(value = "comprarPorId", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity comprarPorId(@RequestBody EfetivarCompra efetivarCompra) {
+
+        GameResponseError gameResponseError = new GameResponseError();
+        GameResponseCompra game = gameService.comprarPorId(efetivarCompra.getCodigoDoJogo(), efetivarCompra.getQuantidade());
+
+        try {
+            if (game == null) {
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo da com o codigo {0}", efetivarCompra.getCodigoDoJogo()));
                 gameResponseError.setHoraDoErro(new Date());
 
                 return ResponseEntity.badRequest().body(gameResponseError);

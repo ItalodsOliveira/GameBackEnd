@@ -37,6 +37,8 @@ public class Game implements Serializable {
     private List<String> idiomas;
     @Column(nullable = false, length = 250)
     private List<String> legendas;
+    @Column(nullable = false, name = "quantidade_em_estoque")
+    private  int quantidadeEmEstoque;
 
     public Long getId() {
         return id;
@@ -132,5 +134,13 @@ public class Game implements Serializable {
 
     public void setLegendas(List<String> legendas) {
         this.legendas = legendas;
+    }
+
+    public int getQuantidadeEmEstoque() {
+        return quantidadeEmEstoque;
+    }
+
+    public void setQuantidadeEmEstoque(int quantidadeEmEstoque) {
+        this.quantidadeEmEstoque = quantidadeEmEstoque;
     }
 }

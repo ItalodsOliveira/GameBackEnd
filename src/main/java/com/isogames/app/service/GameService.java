@@ -1,11 +1,11 @@
 package com.isogames.app.service;
 
 import com.isogames.app.model.Game;
+import com.isogames.app.model.response.GameResponseCompra;
 import com.isogames.app.model.response.GameResponseError;
 import com.isogames.app.repository.GameRepository;
 import com.isogames.app.utils.AjustaPreco;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.text.MessageFormat;
@@ -84,6 +84,7 @@ public class GameService {
             gameAtualizado.setClassificacaoIndiacativa(game.getClassificacaoIndiacativa());
             gameAtualizado.setIdiomas(game.getIdiomas());
             gameAtualizado.setLegendas(game.getLegendas());
+            gameAtualizado.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque());
 
             gameRepository.save(gameAtualizado);
             logger.info(MessageFormat.format("O game {0} foi atualizado com sucesso", gameAtualizado.getNomeDoJogo()));
@@ -198,6 +199,61 @@ public class GameService {
             throw new RuntimeException(e);
         }
         return game;
+    }
+
+    public List<Game> mudaPrecoByDistribuidora(String distribuidora, float percentual, boolean desconto) {
+
+        List<Game> game = new ArrayList<>();
+        try {
+            game = gameRepository.pesquisaPorDistribuidora(distribuidora);
+            logger.info(MessageFormat.format("{0} foram encontrados", game.size()));
+
+            for (int i = 0; i < game.size(); i++) {
+                if (desconto == true) {
+                    game.get(i).setPreco(ajustaPreco.aplicarDesconto(game.get(i).getPreco(), percentual));
+                    logger.info(MessageFormat.format("Foi aplicado um desconto de {0}%, para a distribuidora {1}", percentual, distribuidora));
+                } else {
+                    game.get(i).setPreco(ajustaPreco.aplicarAumento(game.get(i).getPreco(), percentual));
+                    logger.info(MessageFormat.format("Foi aplicado um aumento de {0}%, para a distribuidora {1}", percentual, distribuidora));
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return game;
+    }
+
+    public GameResponseCompra comprarPorId(int codigoDoJogo, int quantidade) {
+
+        GameResponseCompra respostaDeSucesso = new GameResponseCompra();
+        try {
+            Game game = gameRepository.findById(String.valueOf(codigoDoJogo)).orElseThrow();
+            logger.info(MessageFormat.format("O game {0} foi encontrado", game.getNomeDoJogo()));
+            if (quantidade <= game.getQuantidadeEmEstoque()) {
+
+                respostaDeSucesso.setPrecoTotal(game.getPreco() * quantidade);
+                respostaDeSucesso.setQuantidade(quantidade);
+                respostaDeSucesso.setNomeDoJogo(game.getNomeDoJogo());
+                respostaDeSucesso.setPrecoUnidade(game.getPreco());
+                respostaDeSucesso.setHoraDaCompra(new Date());
+                respostaDeSucesso.setMensagem("Compra realizada com sucesso");
+
+                game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque() - quantidade);
+                logger.info(MessageFormat.format("A compra do jogo {0} fica R${1} = preço por unidade R${2} vezes quantidade {3}, ficam no estoque {4}", game.getNomeDoJogo(), respostaDeSucesso.getPrecoTotal(), respostaDeSucesso.getPrecoUnidade(), quantidade, game.getQuantidadeEmEstoque()));
+                gameRepository.save(game);
+            } else {
+
+                respostaDeSucesso.setPrecoTotal(game.getPreco() * quantidade);
+                respostaDeSucesso.setQuantidade(quantidade);
+                respostaDeSucesso.setNomeDoJogo(game.getNomeDoJogo());
+                respostaDeSucesso.setPrecoUnidade(game.getPreco());
+                respostaDeSucesso.setHoraDaCompra(new Date());
+                respostaDeSucesso.setMensagem(MessageFormat.format("Compra não realizada, produto em estoque = {0}", game.getQuantidadeEmEstoque()));
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return respostaDeSucesso;
     }
 
 }
