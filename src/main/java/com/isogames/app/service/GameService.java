@@ -189,9 +189,11 @@ public class GameService {
             for (int i = 0; i < game.size(); i++) {
                 if (desconto == true) {
                     game.get(i).setPreco(ajustaPreco.aplicarDesconto(game.get(i).getPreco(), percentual));
+                    gameRepository.save(game.get(i));
                     logger.info(MessageFormat.format("Foi aplicado um desconto de {0}%, para a classificação indicativa {1}", percentual, classificacaoIndiacativa));
                 } else {
                     game.get(i).setPreco(ajustaPreco.aplicarAumento(game.get(i).getPreco(), percentual));
+                    gameRepository.save(game.get(i));
                     logger.info(MessageFormat.format("Foi aplicado um aumento de {0}%, para a classificação indicativa {1}", percentual, classificacaoIndiacativa));
                 }
             }
@@ -211,9 +213,11 @@ public class GameService {
             for (int i = 0; i < game.size(); i++) {
                 if (desconto == true) {
                     game.get(i).setPreco(ajustaPreco.aplicarDesconto(game.get(i).getPreco(), percentual));
+                    gameRepository.save(game.get(i));
                     logger.info(MessageFormat.format("Foi aplicado um desconto de {0}%, para a distribuidora {1}", percentual, distribuidora));
                 } else {
                     game.get(i).setPreco(ajustaPreco.aplicarAumento(game.get(i).getPreco(), percentual));
+                    gameRepository.save(game.get(i));
                     logger.info(MessageFormat.format("Foi aplicado um aumento de {0}%, para a distribuidora {1}", percentual, distribuidora));
                 }
             }
