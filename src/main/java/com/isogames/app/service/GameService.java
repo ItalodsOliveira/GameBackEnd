@@ -260,4 +260,23 @@ public class GameService {
         return respostaDeSucesso;
     }
 
+    public Game aumentarEstoquePorId(int codigoDoJogo, int quantidadeSomaEstoque){
+
+        GameResponseError gameResponseError = new GameResponseError();
+        Game game = new Game();
+        try {
+            game = gameRepository.findById(String.valueOf(codigoDoJogo)).orElseThrow();
+            game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque() + quantidadeSomaEstoque);
+            gameRepository.save(game);
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return game;
+        }
+        logger.info(MessageFormat.format("O jogo {0} foi encontrado com sucesso e somando com a quanidade de {1}, o estoque fica com o total de {2}", game.getNomeDoJogo(), quantidadeSomaEstoque, game.getQuantidadeEmEstoque()));
+        return game;
+    }
 }

@@ -1,6 +1,7 @@
 package com.isogames.app.controller;
 
 import com.isogames.app.model.Game;
+import com.isogames.app.model.request.AumentarEstoque;
 import com.isogames.app.model.request.CalculaPreco;
 import com.isogames.app.model.request.EfetivarCompra;
 import com.isogames.app.model.response.GameResponseCompra;
@@ -310,6 +311,30 @@ public class GameController {
             if (game == null) {
                 gameResponseError.setHttpCode(400);
                 gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo da com o codigo {0}", efetivarCompra.getCodigoDoJogo()));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
+        }
+        return ResponseEntity.ok().body(game);
+    }
+    @PostMapping(value = "aumentarEstoquePorId", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity aumentarEstoquePorId(@RequestBody AumentarEstoque aumentarEstoque){
+
+        GameResponseError gameResponseError = new GameResponseError();
+        Game game = gameService.aumentarEstoquePorId(aumentarEstoque.getCodigoDoJogo(), aumentarEstoque.getQuantidadeSomaEstoque());
+
+        try {
+            if (game.getId() == null) {
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhum jogo da com o codigo {0}", aumentarEstoque.getCodigoDoJogo()));
                 gameResponseError.setHoraDoErro(new Date());
 
                 return ResponseEntity.badRequest().body(gameResponseError);
