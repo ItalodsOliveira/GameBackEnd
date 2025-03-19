@@ -8,6 +8,8 @@ import com.isogames.app.utils.AjustaPreco;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -235,22 +237,57 @@ public class GameService {
             logger.info(MessageFormat.format("O game {0} foi encontrado", game.getNomeDoJogo()));
             if (quantidade <= game.getQuantidadeEmEstoque()) {
 
-                respostaDeSucesso.setPrecoTotal(game.getPreco() * quantidade);
+                int quantidadeDesconto = 0;
+
+                if (quantidade > 30) {
+                    quantidadeDesconto = 4;
+                }
+                else if (quantidade > 15) {
+                    quantidadeDesconto = 3;
+                }
+                else if (quantidade > 10) {
+                    quantidadeDesconto = 2;
+                }
+                else if (quantidade > 5){
+                    quantidadeDesconto = 1;
+                }
+
+                switch (quantidadeDesconto) {
+                    case 1:
+                        respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(ajustaPreco.aplicarDesconto((game.getPreco() * quantidade), 5)).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+                        respostaDeSucesso.setMensagem("Compra realizada com sucesso, com desconto de 5%");
+                        break;
+                    case 2:
+                        respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(ajustaPreco.aplicarDesconto((game.getPreco() * quantidade), 7)).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+                        respostaDeSucesso.setMensagem("Compra realizada com sucesso, com desconto de 7%");
+                        break;
+                    case 3:
+                        respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(ajustaPreco.aplicarDesconto((game.getPreco() * quantidade), 10)).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+                        respostaDeSucesso.setMensagem("Compra realizada com sucesso, com desconto de 10%");
+                        break;
+                    case 4:
+                        respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(ajustaPreco.aplicarDesconto((game.getPreco() * quantidade), 15)).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+                        respostaDeSucesso.setMensagem("Compra realizada com sucesso, com desconto de 15%");
+                        break;
+                    default:
+                        respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(game.getPreco() * quantidade).setScale(2,BigDecimal.ROUND_HALF_EVEN));
+                        respostaDeSucesso.setMensagem("Compra realizada com sucesso");
+                        break;
+                }
                 respostaDeSucesso.setQuantidade(quantidade);
                 respostaDeSucesso.setNomeDoJogo(game.getNomeDoJogo());
-                respostaDeSucesso.setPrecoUnidade(game.getPreco());
+                respostaDeSucesso.setPrecoUnidade(BigDecimal.valueOf(game.getPreco()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
                 respostaDeSucesso.setHoraDaCompra(new Date());
-                respostaDeSucesso.setMensagem("Compra realizada com sucesso");
 
                 game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque() - quantidade);
                 logger.info(MessageFormat.format("A compra do jogo {0} fica R${1} = preço por unidade R${2} vezes quantidade {3}, ficam no estoque {4}", game.getNomeDoJogo(), respostaDeSucesso.getPrecoTotal(), respostaDeSucesso.getPrecoUnidade(), quantidade, game.getQuantidadeEmEstoque()));
                 gameRepository.save(game);
             } else {
 
-                respostaDeSucesso.setPrecoTotal(game.getPreco() * quantidade);
+                respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(game.getPreco() * quantidade));
                 respostaDeSucesso.setQuantidade(quantidade);
                 respostaDeSucesso.setNomeDoJogo(game.getNomeDoJogo());
-                respostaDeSucesso.setPrecoUnidade(game.getPreco());
+                respostaDeSucesso.setPrecoUnidade(BigDecimal.valueOf(game.getPreco()).setScale(2,BigDecimal.ROUND_HALF_EVEN));
                 respostaDeSucesso.setHoraDaCompra(new Date());
                 respostaDeSucesso.setMensagem(MessageFormat.format("Compra não realizada, produto em estoque = {0}", game.getQuantidadeEmEstoque()));
             }
@@ -260,7 +297,7 @@ public class GameService {
         return respostaDeSucesso;
     }
 
-    public Game aumentarEstoquePorId(int codigoDoJogo, int quantidadeSomaEstoque){
+    public Game aumentarEstoquePorId(int codigoDoJogo, int quantidadeSomaEstoque) {
 
         GameResponseError gameResponseError = new GameResponseError();
         Game game = new Game();
@@ -279,4 +316,5 @@ public class GameService {
         logger.info(MessageFormat.format("O jogo {0} foi encontrado com sucesso e somando com a quanidade de {1}, o estoque fica com o total de {2}", game.getNomeDoJogo(), quantidadeSomaEstoque, game.getQuantidadeEmEstoque()));
         return game;
     }
+
 }

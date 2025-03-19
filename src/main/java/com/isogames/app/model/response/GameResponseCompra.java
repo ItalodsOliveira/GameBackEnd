@@ -3,6 +3,7 @@ package com.isogames.app.model.response;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Getter
@@ -11,8 +12,8 @@ public class GameResponseCompra {
 
     private Date horaDaCompra;
     private String nomeDoJogo;
-    private float precoTotal;
-    private float precoUnidade;
+    private BigDecimal precoTotal;
+    private BigDecimal precoUnidade;
     private int quantidade;
     private String mensagem;
 }
