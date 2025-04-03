@@ -1,8 +1,10 @@
 package com.isogames.app.service;
 
+import com.isogames.app.model.BuyGame;
 import com.isogames.app.model.Game;
 import com.isogames.app.model.response.GameResponseCompra;
 import com.isogames.app.model.response.GameResponseError;
+import com.isogames.app.repository.BuyGamesRepository;
 import com.isogames.app.repository.GameRepository;
 import com.isogames.app.utils.AjustaPreco;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ public class GameService {
 
     @Autowired
     AjustaPreco ajustaPreco;
+
+    @Autowired
+    BuyGamesRepository buyGamesRepository;
 
     public Game createGame(Game game) {
 
@@ -233,6 +238,7 @@ public class GameService {
 
         GameResponseCompra respostaDeSucesso = new GameResponseCompra();
         try {
+            BuyGame buyGame = new BuyGame();
             Game game = gameRepository.findById(String.valueOf(codigoDoJogo)).orElseThrow();
             logger.info(MessageFormat.format("O game {0} foi encontrado", game.getNomeDoJogo()));
             if (quantidade <= game.getQuantidadeEmEstoque()) {
@@ -282,6 +288,15 @@ public class GameService {
                 game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque() - quantidade);
                 logger.info(MessageFormat.format("A compra do jogo {0} fica R${1} = preço por unidade R${2} vezes quantidade {3}, ficam no estoque {4}", game.getNomeDoJogo(), respostaDeSucesso.getPrecoTotal(), respostaDeSucesso.getPrecoUnidade(), quantidade, game.getQuantidadeEmEstoque()));
                 gameRepository.save(game);
+
+                buyGame.setCodigoDoJogo(game.getId());
+                buyGame.setDataDaCompra(new Date());
+                buyGame.setPrecoTotal(respostaDeSucesso.getPrecoTotal());
+                buyGame.setNomeDoJogo(respostaDeSucesso.getNomeDoJogo());
+                buyGame.setPrecoUnidade(respostaDeSucesso.getPrecoUnidade());
+                buyGame.setQuantidadeComprada(respostaDeSucesso.getQuantidade());
+                buyGamesRepository.save(buyGame);
+
             } else {
 
                 respostaDeSucesso.setPrecoTotal(BigDecimal.valueOf(game.getPreco() * quantidade));

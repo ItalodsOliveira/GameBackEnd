@@ -1,5 +1,6 @@
 package com.isogames.app.repository;
 
+import com.isogames.app.model.BuyGame;
 import com.isogames.app.model.Game;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -9,7 +10,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface GameRepository extends JpaRepository<Game, String> {
+public interface GameRepository extends JpaRepository<Game, String>{
 
     @Query(value = "Select n from Game n where n.nomeDoJogo like %?1%")
     List<Game> pesquisaPorNome(String nomeDoJogo);
