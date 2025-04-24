@@ -25,16 +25,14 @@ public class BuyGame implements Serializable {
     private BigDecimal precoTotal;
     @Column(nullable = false, name = "data_da_compra")
     private Date dataDaCompra;
+    @Column(nullable = true, name = "data_da_devolucao")
+    private Date dataDaDevolucao;
     @Column(nullable = false, name = "quantidade_comprada")
     private  int quantidadeComprada;
-
-    public Long getCodigoDoJogo() {
-        return codigoDoJogo;
-    }
-
-    public void setCodigoDoJogo(Long codigoDoJogo) {
-        this.codigoDoJogo = codigoDoJogo;
-    }
+    @Column(nullable = true, name = "quantidade_devolvida")
+    private  Long quantidadeDevolvida;
+    @Column(nullable = true, name = "valor_da_devolucao")
+    private  BigDecimal valorDaDevolucao;
 
     public Long getId() {
         return id;
@@ -42,6 +40,14 @@ public class BuyGame implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Long getCodigoDoJogo() {
+        return codigoDoJogo;
+    }
+
+    public void setCodigoDoJogo(Long codigoDoJogo) {
+        this.codigoDoJogo = codigoDoJogo;
     }
 
     public String getNomeDoJogo() {
@@ -76,12 +82,36 @@ public class BuyGame implements Serializable {
         this.dataDaCompra = dataDaCompra;
     }
 
+    public Date getDataDaDevolucao() {
+        return dataDaDevolucao;
+    }
+
+    public void setDataDaDevolucao(Date dataDaDevolucao) {
+        this.dataDaDevolucao = dataDaDevolucao;
+    }
+
     public int getQuantidadeComprada() {
         return quantidadeComprada;
     }
 
     public void setQuantidadeComprada(int quantidadeComprada) {
         this.quantidadeComprada = quantidadeComprada;
+    }
+
+    public Long getQuantidadeDevolvida() {
+        return quantidadeDevolvida;
+    }
+
+    public void setQuantidadeDevolvida(Long quantidadeDevolvida) {
+        this.quantidadeDevolvida = quantidadeDevolvida;
+    }
+
+    public BigDecimal getValorDaDevolucao() {
+        return valorDaDevolucao;
+    }
+
+    public void setValorDaDevolucao(BigDecimal valorDaDevolucao) {
+        this.valorDaDevolucao = valorDaDevolucao;
     }
 }
 

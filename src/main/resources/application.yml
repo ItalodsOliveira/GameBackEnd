@@ -22,5 +22,5 @@ spring:
   #  6 dia da semana (preenchido de 0 a 6)
 
   scheduler:
-    start: 01 10 * * * *
+    start: 01 * * * * *
     zone: America/Sao_Paulo

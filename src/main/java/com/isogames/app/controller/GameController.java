@@ -1,5 +1,6 @@
 package com.isogames.app.controller;
 
+import com.isogames.app.model.BuyGame;
 import com.isogames.app.model.Game;
 import com.isogames.app.model.request.AumentarEstoque;
 import com.isogames.app.model.request.CalculaPreco;
@@ -348,5 +349,31 @@ public class GameController {
             return ResponseEntity.badRequest().body(gameResponseError);
         }
         return ResponseEntity.ok().body(game);
+    }
+
+    @GetMapping(value = "devolverPorId", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity devolverPorId(@RequestParam(value = "idDaCompra", required = true) int idDaCompra,
+                                        @RequestParam(value = "quantidadeDevolvida", required = true) int quantidadeDevolvida){
+
+        GameResponseError gameResponseError = new GameResponseError();
+        BuyGame gameDevolvido = gameService.devolvoverPorId(idDaCompra, quantidadeDevolvida);
+
+        try {
+            if (gameDevolvido.getId() == null) {
+                gameResponseError.setHttpCode(400);
+                gameResponseError.setMensagemDeErro(MessageFormat.format("Não foi encontrado nenhuma compra do game {0}", gameDevolvido.getId()));
+                gameResponseError.setHoraDoErro(new Date());
+
+                return ResponseEntity.badRequest().body(gameResponseError);
+            }
+        } catch (Exception e) {
+
+            gameResponseError.setHttpCode(400);
+            gameResponseError.setMensagemDeErro(e.getMessage());
+            gameResponseError.setHoraDoErro(new Date());
+
+            return ResponseEntity.badRequest().body(gameResponseError);
+        }
+        return ResponseEntity.ok().body(gameDevolvido);
     }
 }
