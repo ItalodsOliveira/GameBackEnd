@@ -23,4 +23,4 @@ spring:
 
   scheduler:
     start: 01 * * * * *
-    zone: America/Sao_Paulo
+    zone: "America/Sao_Paulo"

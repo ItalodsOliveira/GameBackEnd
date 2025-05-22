@@ -7,7 +7,7 @@ import com.isogames.app.model.response.GameResponseError;
 import com.isogames.app.repository.BuyGamesRepository;
 import com.isogames.app.repository.GameRepository;
 import com.isogames.app.utils.AjustaPreco;
-import com.isogames.app.utils.CalculaDevolucao;
+import com.isogames.app.utils.CalculoDeValores;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -34,13 +34,15 @@ public class GameService {
     BuyGamesRepository buyGamesRepository;
 
     @Autowired
-    CalculaDevolucao calculaDevolucao;
+    CalculoDeValores calculoDeValores;
 
     public Game createGame(Game game) {
 
         Game gameCriado = new Game();
 
         try {
+
+            game.setPrecoTotalEmestoque(gameCriado.getPreco() * gameCriado.getQuantidadeEmEstoque());
             gameCriado = gameRepository.save(game);
             logger.info("Game cadastrado com sucesso");
         } catch (Exception e) {
@@ -96,6 +98,8 @@ public class GameService {
             gameAtualizado.setIdiomas(game.getIdiomas());
             gameAtualizado.setLegendas(game.getLegendas());
             gameAtualizado.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque());
+            gameAtualizado.setPrecoTotalEmestoque(gameAtualizado.getPreco() * gameAtualizado.getQuantidadeEmEstoque());
+
 
             gameRepository.save(gameAtualizado);
             logger.info(MessageFormat.format("O game {0} foi atualizado com sucesso", gameAtualizado.getNomeDoJogo()));
@@ -200,10 +204,12 @@ public class GameService {
             for (int i = 0; i < game.size(); i++) {
                 if (desconto == true) {
                     game.get(i).setPreco(ajustaPreco.aplicarDesconto(game.get(i).getPreco(), percentual));
+                    game.get(i).setPrecoTotalEmestoque(game.get(i).getPreco() * game.get(i).getQuantidadeEmEstoque());
                     gameRepository.save(game.get(i));
                     logger.info(MessageFormat.format("Foi aplicado um desconto de {0}%, para a classificação indicativa {1}", percentual, classificacaoIndiacativa));
                 } else {
                     game.get(i).setPreco(ajustaPreco.aplicarAumento(game.get(i).getPreco(), percentual));
+                    game.get(i).setPrecoTotalEmestoque(game.get(i).getPreco() * game.get(i).getQuantidadeEmEstoque());
                     gameRepository.save(game.get(i));
                     logger.info(MessageFormat.format("Foi aplicado um aumento de {0}%, para a classificação indicativa {1}", percentual, classificacaoIndiacativa));
                 }
@@ -287,6 +293,7 @@ public class GameService {
                 respostaDeSucesso.setHoraDaCompra(new Date());
 
                 game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque() - quantidade);
+                game.setPrecoTotalEmestoque(game.getPreco() * game.getQuantidadeEmEstoque());
                 logger.info(MessageFormat.format("A compra do jogo {0} fica R${1} = preço por unidade R${2} vezes quantidade {3}, ficam no estoque {4}", game.getNomeDoJogo(), respostaDeSucesso.getPrecoTotal(), respostaDeSucesso.getPrecoUnidade(), quantidade, game.getQuantidadeEmEstoque()));
                 gameRepository.save(game);
 
@@ -320,6 +327,7 @@ public class GameService {
         try {
             game = gameRepository.findById(String.valueOf(codigoDoJogo)).orElseThrow();
             game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque() + quantidadeSomaEstoque);
+            game.setPrecoTotalEmestoque(game.getPreco() * game.getQuantidadeEmEstoque());
             gameRepository.save(game);
         } catch (Exception e) {
 
@@ -352,7 +360,7 @@ public class GameService {
             if (devolucaoGame != null) {
 
                 devolucaoGame.setQuantidadeDevolvida(Long.valueOf(quantidadeDevolucao));
-                devolucaoGame.setValorDaDevolucao(calculaDevolucao.calcularValorDaDevolucao(
+                devolucaoGame.setValorDaDevolucao(calculoDeValores.calcularValorDaDevolucao(
                         String.valueOf(devolucaoGame.getPrecoTotal()),
                         String.valueOf(devolucaoGame.getQuantidadeComprada()
                         ), String.valueOf(quantidadeDevolucao)));
@@ -360,6 +368,7 @@ public class GameService {
 
                 Game game = readGameById(devolucaoGame.getCodigoDoJogo());
                 game.setQuantidadeEmEstoque(game.getQuantidadeEmEstoque()+quantidadeDevolucao);
+                game.setPrecoTotalEmestoque(game.getPreco() * game.getQuantidadeEmEstoque());
                 gameRepository.save(game);
                 buyGamesRepository.save(devolucaoGame);
 

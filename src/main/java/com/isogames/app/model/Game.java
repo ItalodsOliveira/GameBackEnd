@@ -27,6 +27,8 @@ public class Game implements Serializable {
     private String distribuidora;
     @Column(nullable = false)
     private float preco;
+    @Column(nullable = false, name = "preco_total_em_estoque")
+    private float precoTotalEmestoque;
     @Column(nullable = false, length = 250)
     private List<String> plataforma;
     @Column(nullable = false, length = 50)
@@ -94,6 +96,14 @@ public class Game implements Serializable {
 
     public void setPreco(float preco) {
         this.preco = preco;
+    }
+
+    public float getPrecoTotalEmestoque() {
+        return precoTotalEmestoque;
+    }
+
+    public void setPrecoTotalEmestoque(float precoTotalEmestoque) {
+        this.precoTotalEmestoque = precoTotalEmestoque;
     }
 
     public List<String> getPlataforma() {

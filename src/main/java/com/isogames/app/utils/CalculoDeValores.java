@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
 
 @Component
-public class CalculaDevolucao {
+public class CalculoDeValores {
 
     public BigDecimal calcularValorDaDevolucao(String valorTotal, String quantidadeComprada, String quantidadeDevolvida){
 
@@ -18,4 +18,5 @@ public class CalculaDevolucao {
 
         return valorDevolvido;
     }
+
 }
